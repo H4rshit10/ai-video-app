@@ -1,0 +1,20 @@
+# Google Generative AI SDK — Gemini (Director), Imagen (frames), Veo (video) via Vertex
+google-genai>=0.8.0
+
+# Google Cloud Text-to-Speech — Chirp 3 HD / Neural2 voices, SSML
+google-cloud-texttospeech>=2.16.0
+
+# Video assembly
+moviepy>=2.0.0
+imageio-ffmpeg>=0.5.0
+Pillow>=10.0.0
+numpy>=1.26.0
+
+# Web UI
+streamlit>=1.32.0
+
+# Schema validation for Gemini structured output
+pydantic>=2.6.0
+
+# Config / secrets loading
+python-dotenv>=1.0.0

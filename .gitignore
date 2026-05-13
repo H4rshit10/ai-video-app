@@ -1,0 +1,28 @@
+# Secrets — never commit
+.env
+*.key.json
+service-account*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Generated outputs
+outputs/
+*.mp4
+*.mp3
+*.wav
+*.png
+*.jpg
+# Keep example assets if we add any later under assets/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
