@@ -1,0 +1,37 @@
+{
+  "questions": [
+    {
+      "question": "What is Hampi recognized as today?",
+      "choices": [
+        "A modern bustling city",
+        "A UNESCO World Heritage site",
+        "A natural wildlife reserve",
+        "A major industrial hub"
+      ],
+      "correct_index": 1,
+      "explanation": "Hampi is a UNESCO World Heritage site, celebrated for its historical and architectural significance."
+    },
+    {
+      "question": "Which river flows near Hampi?",
+      "choices": [
+        "Ganges River",
+        "Yamuna River",
+        "Tungabhadra River",
+        "Brahmaputra River"
+      ],
+      "correct_index": 2,
+      "explanation": "The Tungabhadra River flows gracefully through the landscape of Hampi."
+    },
+    {
+      "question": "What is a famous architectural feature found in Hampi?",
+      "choices": [
+        "Eiffel Tower replica",
+        "Statue of Liberty",
+        "Stone Chariot",
+        "Pyramids of Giza"
+      ],
+      "correct_index": 2,
+      "explanation": "The Stone Chariot at Vittala Temple is one of Hampi's most iconic architectural wonders."
+    }
+  ]
+}

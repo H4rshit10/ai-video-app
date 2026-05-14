@@ -1,0 +1,13 @@
+{
+  "1": {
+    "question": "When you cut a pizza into two equal pieces, what do we call each piece?",
+    "choices": [
+      "A slice",
+      "A half",
+      "A quarter",
+      "A whole"
+    ],
+    "correct_index": 1,
+    "explanation": "That's right! When you split something into two equal parts, each part is called a half."
+  }
+}

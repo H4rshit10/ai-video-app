@@ -318,3 +318,69 @@ V1 ships when **all** of these hold:
 5. UI displays cost estimate per run (< $0.50 without Veo).
 6. `NOTES.md` exists with ≥ 5 links to Google docs (Gemini, Imagen, Veo, Cloud TTS, Vertex AI overview).
 7. No third-party APIs anywhere in the code (only `google-genai`, `google-cloud-texttospeech`, `moviepy`, `streamlit`, `pydantic`, `python-dotenv`).
+
+---
+
+## 12. v1.1 — Interactive Video Platform (2026-05-14)
+
+Built on top of V1 in response to feedback from the recruiter review (Nitin Kamble, 2026-05-14):
+
+> *"Check if there is support for interactive video. Use case being a quiz at the end of the video. Also a ad between the video."*
+
+### 12.1 Scope of v1.1
+
+The literal asks (end-of-video quiz, ad between video) were generalised into an **Interactive Video Platform** with these capabilities:
+
+| Feature | Mechanism |
+|---|---|
+| Mid-video comprehension checkpoints | Director places `Scene.checkpoint: Question \| None` at the conceptually meaningful scene. The UI pauses between scenes and blocks progress until answered. |
+| End-of-video summative quiz | `VideoPlan.end_quiz: Quiz \| None` with 3-5 MCQ questions. UI renders scoring + reveal-explanation. |
+| Pre-roll ad placeholder | 3-second branded card in Streamlit before the video plays. Insertion point for full Google IMA SDK integration in v2. |
+| Subtitle burn-in | Spoken dialogue burned at bottom third; on-screen headline stays at upper third. Controlled by `Scene.enable_subtitles`. |
+| Title + outro cards | 2-second branded cards bracketing the scene sequence in `final.mp4`. |
+| Per-scene MP4 export | `assemble.py` writes `scene_<i>_clip.mp4` per scene to support the Interactive player. |
+| Chirp 3 HD voice primary | Per-content-type mapping (`math -> Aoede`, `place -> Kore`, `story -> Leda`). Silent fallback to Neural2-C on failure. |
+
+### 12.2 Director — Senior Director persona
+
+`SYSTEM_INSTRUCTIONS` rewritten as a ~150-line senior video director persona covering:
+
+- The 7 Rules of Enhanced Output (Specific > Generic, consistent recurring character, 6-element visual language template, show-don't-tell, hook→build→reveal→recap pacing, spoken English only, captions are headlines)
+- Per-content-type style guides (math / place / story / general)
+- Dialogue quality calibration (bad vs good examples baked into the prompt)
+- Visual prompt quality calibration (bad vs good examples baked into the prompt)
+- Rules for placing one mid-video checkpoint and a 3-5 question end quiz (math / place / general only — stories skip quizzes)
+
+### 12.3 Schema evolution (backward compatible)
+
+```python
+class VideoPlan(BaseModel):
+    title: str
+    tagline: str                                       # NEW
+    content_type: Literal["math", "place", "story", "general"]
+    style_guide: str                                   # NEW
+    recurring_character_description: str | None        # NEW
+    voice_recommendation: str                          # NEW
+    scenes: list[Scene]
+    end_quiz: Quiz | None                              # NEW
+
+class Scene(BaseModel):
+    # ... existing fields preserved ...
+    checkpoint: Question | None = None                 # NEW
+    enable_subtitles: bool = True                      # NEW
+```
+
+### 12.4 Streamlit UI — Linear vs Interactive modes
+
+- Sidebar toggle picks the playback mode.
+- **Linear:** plays the full concatenated `final.mp4` (title card → scenes → outro card), then renders the end quiz if present.
+- **Interactive:** state-machine over `st.session_state` plays `scene_<i>_clip.mp4` files sequentially. Between scenes, if a checkpoint is set, renders the MCQ and blocks progress with a "Continue" button gated on submission. After the final scene, renders the end quiz with scoring + reveal explanations.
+
+### 12.5 Acceptance criteria for v1.1 (all met 2026-05-14)
+
+1. Director schema and SYSTEM_INSTRUCTIONS support quiz + checkpoint generation.
+2. Cloud TTS Chirp 3 HD voices auto-selected by content type; Neural2 silent fallback works.
+3. Pipeline writes `quiz.json`, `checkpoints.json`, and per-scene `scene_<i>_clip.mp4` files alongside `final.mp4`.
+4. Streamlit UI exposes Linear and Interactive modes with a pre-roll ad placeholder.
+5. End-to-end test on fractions produces a valid run (~$0.17, 4 scenes, 1 checkpoint, 3-question end quiz, Chirp 3 HD voice used without fallback).
+6. README, NOTES.md, and this design spec updated to reflect v1.1 architecture.

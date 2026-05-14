@@ -1,0 +1,61 @@
+{
+  "title": "The Lion and the Mouse: A Fable of Friendship",
+  "tagline": "Discover how even the smallest friend can make the biggest difference!",
+  "content_type": "story",
+  "style_guide": "Richly textured storybook watercolor illustration, expressive character faces, warm narrative lighting, consistent character design across scenes, soft saturated palette.",
+  "recurring_character_description": "A majestic golden-maned lion with a kindly expression and a royal blue cloak. A small, brave grey mouse with bright black eyes and a tiny green backpack.",
+  "voice_recommendation": "en-US-Chirp3-HD-Leda",
+  "scenes": [
+    {
+      "scene_index": 0,
+      "visual_prompt": "Medium wide shot, warm sun-dappled lighting, cheerful inviting mood, richly textured storybook watercolor illustration, soft saturated palette, a majestic golden-maned lion with a kindly expression and a royal blue cloak, napping peacefully under a large jungle tree. A small, brave grey mouse with bright black eyes and a tiny green backpack, scurries past the lion's paw, accidentally waking him.",
+      "generator": "imagen",
+      "audio_dialogue": "Deep in the jungle, a mighty lion was snoozing, dreaming kingly dreams. But then, a tiny mouse, scurrying by, accidentally woke him up!",
+      "on_screen_text": "A Mighty Roar!",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 1,
+      "visual_prompt": "Close-up shot, soft warm lighting, slightly tense but hopeful mood, richly textured storybook watercolor illustration, soft saturated palette, a majestic golden-maned lion with a kindly expression and a royal blue cloak, holding a small, brave grey mouse with bright black eyes and a tiny green backpack gently in his large paw. The mouse looks fearful but determined, pleading with the lion.",
+      "generator": "imagen",
+      "audio_dialogue": "The lion was furious! But the little mouse begged for his life, promising, 'One day, I'll help you, mighty king!'",
+      "on_screen_text": "A Tiny Promise",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 2,
+      "visual_prompt": "Wide cinematic shot, dramatic lighting with dappled shadows, distressed and urgent mood, richly textured storybook watercolor illustration, soft saturated palette, a majestic golden-maned lion with a kindly expression and a royal blue cloak, looking distressed and trapped in a large, strong hunter's net, struggling slightly. A small, brave grey mouse with bright black eyes and a tiny green backpack, appears at the edge of the scene, seeing the trapped lion.",
+      "generator": "imagen",
+      "audio_dialogue": "Years later, when the mighty lion was trapped in a hunter's net, struggling to break free, who do you think came to save him?",
+      "on_screen_text": "Lion Trapped!",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 3,
+      "visual_prompt": "Close-up shot, focused bright lighting on the action, determined and hopeful mood, richly textured storybook watercolor illustration, soft saturated palette, showing a thick rope of the hunter's net. A small, brave grey mouse with bright black eyes and a tiny green backpack, is busily gnawing through the rope with his tiny, sharp teeth. The majestic golden-maned lion with a kindly expression and a royal blue cloak, is partially visible in the background, watching with hope.",
+      "generator": "imagen",
+      "audio_dialogue": "The tiny mouse remembered his promise! He gnawed and gnawed, until the strong ropes broke, setting the lion free!",
+      "on_screen_text": "Mouse to the Rescue!",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 4,
+      "visual_prompt": "Wide shot, warm narrative lighting, peaceful and respectful mood, richly textured storybook watercolor illustration, soft saturated palette, a majestic golden-maned lion with a kindly expression and a royal blue cloak, standing proudly beside a small, brave grey mouse with bright black eyes and a tiny green backpack. They are looking at each other with mutual respect and friendship in a peaceful jungle clearing, bathed in warm light.",
+      "generator": "imagen",
+      "audio_dialogue": "So, remember, even the smallest act of kindness can lead to the biggest friendship. Never underestimate anyone!",
+      "on_screen_text": "Kindness Matters",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    }
+  ],
+  "end_quiz": null
+}

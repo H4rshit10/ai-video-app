@@ -1,0 +1,97 @@
+{
+  "title": "Fractions Fun: Sharing Pizza!",
+  "tagline": "Learn all about fractions by sharing yummy treats with our fox friend!",
+  "content_type": "math",
+  "style_guide": "Clean modern flat illustration, bold primary colors (red, blue, yellow on cream background), friendly mascot, minimal background, generous whitespace, soft drop shadows.",
+  "recurring_character_description": "a smiling red fox with a striped blue scarf, large expressive eyes",
+  "voice_recommendation": "en-US-Chirp3-HD-Aoede",
+  "scenes": [
+    {
+      "scene_index": 0,
+      "visual_prompt": "Top-down view, bright studio lighting, cheerful inviting mood, clean modern flat illustration, bold primary colors (red, blue, yellow on cream background), a smiling red fox with a striped blue scarf, large expressive eyes, sitting happily next to a perfectly round, uncut pepperoni pizza, soft drop shadow.",
+      "generator": "imagen",
+      "audio_dialogue": "Hey there! Ever had a big, yummy pizza all to yourself? It's the best feeling, right?",
+      "on_screen_text": "A Whole Pizza!",
+      "duration_seconds": 4.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 1,
+      "visual_prompt": "Top-down view, bright studio lighting, cheerful inviting mood, clean modern flat illustration, bold primary colors (red, blue, yellow on cream background), a smiling red fox with a striped blue scarf, large expressive eyes, carefully cutting a round pepperoni pizza exactly down the middle into two equal halves with a pizza cutter, soft drop shadow.",
+      "generator": "imagen",
+      "audio_dialogue": "But what if you want to share it with a friend? You'd cut it right down the middle, making two equal pieces!",
+      "on_screen_text": "Sharing Halves!",
+      "duration_seconds": 6.0,
+      "checkpoint": {
+        "question": "When you cut a pizza into two equal pieces, what do we call each piece?",
+        "choices": [
+          "A slice",
+          "A half",
+          "A quarter",
+          "A whole"
+        ],
+        "correct_index": 1,
+        "explanation": "That's right! When you split something into two equal parts, each part is called a half."
+      },
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 2,
+      "visual_prompt": "Top-down view, bright studio lighting, cheerful inviting mood, clean modern flat illustration, bold primary colors (red, blue, yellow on cream background), a smiling red fox with a striped blue scarf, large expressive eyes, now cutting each of the two pizza halves into two more equal pieces, resulting in four equal slices arranged like a whole pizza, soft drop shadow.",
+      "generator": "imagen",
+      "audio_dialogue": "Now you have two halves! And if you cut each half again, you get even more pieces. Each of these four equal pieces is called a quarter!",
+      "on_screen_text": "Four Quarters!",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 3,
+      "visual_prompt": "Top-down view, bright studio lighting, cheerful inviting mood, clean modern flat illustration, bold primary colors (red, blue, yellow on cream background), a smiling red fox with a striped blue scarf, large expressive eyes, pointing to the four equal pizza slices that are now perfectly rejoined to form the original whole pizza, soft drop shadow.",
+      "generator": "imagen",
+      "audio_dialogue": "See? Each small piece is just a part of the big, whole pizza. Fractions help us talk about these equal parts!",
+      "on_screen_text": "Parts of a Whole!",
+      "duration_seconds": 5.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    }
+  ],
+  "end_quiz": {
+    "questions": [
+      {
+        "question": "What is a 'whole' pizza before you cut it?",
+        "choices": [
+          "Many pieces",
+          "One big piece",
+          "A half",
+          "A quarter"
+        ],
+        "correct_index": 1,
+        "explanation": "Before you cut it, a pizza is one whole, complete item!"
+      },
+      {
+        "question": "How many equal pieces do you get if you cut a pizza into 'halves'?",
+        "choices": [
+          "One piece",
+          "Two pieces",
+          "Four pieces",
+          "Three pieces"
+        ],
+        "correct_index": 1,
+        "explanation": "You get two equal pieces when you cut something in half."
+      },
+      {
+        "question": "If you have four equal pieces of pizza, what is each piece called?",
+        "choices": [
+          "A half",
+          "A whole",
+          "A quarter",
+          "A slice"
+        ],
+        "correct_index": 2,
+        "explanation": "Each of four equal pieces is called a quarter."
+      }
+    ]
+  }
+}

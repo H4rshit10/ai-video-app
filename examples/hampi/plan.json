@@ -1,0 +1,97 @@
+{
+  "title": "Hampi: Whispers of a Lost Empire",
+  "tagline": "Uncover the lost city of Hampi, where ancient ruins whisper tales of a forgotten empire.",
+  "content_type": "place",
+  "style_guide": "Photorealistic documentary photography, golden-hour or blue-hour lighting, wide cinematic compositions, warm earthy color palette with deep shadows, no modern people.",
+  "recurring_character_description": null,
+  "voice_recommendation": "en-US-Chirp3-HD-Kore",
+  "scenes": [
+    {
+      "scene_index": 0,
+      "visual_prompt": "Wide cinematic shot, warm golden-hour lighting with long shadows, awe-inspiring contemplative mood, photorealistic documentary photography, warm ochre and deep indigo color palette, a majestic panoramic view of Hampi's boulder-strewn landscape with ancient ruins subtly integrated, a distant temple gopuram visible.",
+      "generator": "imagen",
+      "audio_dialogue": "Ever wondered about cities lost to time, where every stone tells a story? Journey with us to Hampi, India.",
+      "on_screen_text": "Hampi: Lost City",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 1,
+      "visual_prompt": "Wide cinematic shot, warm golden-hour lighting with long shadows, awe-inspiring contemplative mood, photorealistic documentary photography, warm ochre and deep indigo color palette, the grand Virupaksha Temple complex, ancient stone structures rising against a dramatic sky, showing its scale and intricate carvings.",
+      "generator": "imagen",
+      "audio_dialogue": "This UNESCO World Heritage site was once the magnificent capital of the Vijayanagara Empire, a powerful kingdom that flourished for centuries.",
+      "on_screen_text": "Vijayanagara Empire",
+      "duration_seconds": 7.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 2,
+      "visual_prompt": "Medium close-up shot, crisp morning light, awe-inspiring contemplative mood, photorealistic documentary photography, warm ochre and deep indigo color palette, the iconic Stone Chariot at Vittala Temple, detailed carvings visible on its wheels and body, surrounded by ancient stone structures.",
+      "generator": "imagen",
+      "audio_dialogue": "Marvel at its unique architecture: from the iconic Stone Chariot to the musical pillars that echo ancient melodies, Hampi is an engineering marvel.",
+      "on_screen_text": "Architectural Wonders",
+      "duration_seconds": 7.0,
+      "checkpoint": {
+        "question": "Which empire was Hampi the capital of?",
+        "choices": [
+          "Mughal Empire",
+          "Mauryan Empire",
+          "Vijayanagara Empire",
+          "Gupta Empire"
+        ],
+        "correct_index": 2,
+        "explanation": "Hampi was the capital of the powerful Vijayanagara Empire, a prominent kingdom in South India."
+      },
+      "enable_subtitles": true
+    },
+    {
+      "scene_index": 3,
+      "visual_prompt": "Wide cinematic shot, soft blue-hour lighting, serene reflective mood, photorealistic documentary photography, warm ochre and deep indigo color palette, a panoramic view of Hampi's ruins at dusk, with the Tungabhadra River flowing gently in the background, showing the vastness and peaceful beauty of the site.",
+      "generator": "imagen",
+      "audio_dialogue": "Hampi's ruins stand as a breathtaking testament to a glorious past, inviting us to explore its mysteries and remember its grandeur.",
+      "on_screen_text": "Explore Ancient Hampi",
+      "duration_seconds": 6.0,
+      "checkpoint": null,
+      "enable_subtitles": true
+    }
+  ],
+  "end_quiz": {
+    "questions": [
+      {
+        "question": "What is Hampi recognized as today?",
+        "choices": [
+          "A modern bustling city",
+          "A UNESCO World Heritage site",
+          "A natural wildlife reserve",
+          "A major industrial hub"
+        ],
+        "correct_index": 1,
+        "explanation": "Hampi is a UNESCO World Heritage site, celebrated for its historical and architectural significance."
+      },
+      {
+        "question": "Which river flows near Hampi?",
+        "choices": [
+          "Ganges River",
+          "Yamuna River",
+          "Tungabhadra River",
+          "Brahmaputra River"
+        ],
+        "correct_index": 2,
+        "explanation": "The Tungabhadra River flows gracefully through the landscape of Hampi."
+      },
+      {
+        "question": "What is a famous architectural feature found in Hampi?",
+        "choices": [
+          "Eiffel Tower replica",
+          "Statue of Liberty",
+          "Stone Chariot",
+          "Pyramids of Giza"
+        ],
+        "correct_index": 2,
+        "explanation": "The Stone Chariot at Vittala Temple is one of Hampi's most iconic architectural wonders."
+      }
+    ]
+  }
+}

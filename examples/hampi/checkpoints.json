@@ -1,0 +1,13 @@
+{
+  "2": {
+    "question": "Which empire was Hampi the capital of?",
+    "choices": [
+      "Mughal Empire",
+      "Mauryan Empire",
+      "Vijayanagara Empire",
+      "Gupta Empire"
+    ],
+    "correct_index": 2,
+    "explanation": "Hampi was the capital of the powerful Vijayanagara Empire, a prominent kingdom in South India."
+  }
+}

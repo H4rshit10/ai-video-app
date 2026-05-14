@@ -19,7 +19,10 @@ outputs/
 *.wav
 *.png
 *.jpg
-# Keep example assets if we add any later under assets/
+
+# But always include the curated demo outputs under examples/
+!examples/
+!examples/**
 
 # IDE / OS
 .vscode/
