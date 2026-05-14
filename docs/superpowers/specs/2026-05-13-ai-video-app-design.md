@@ -1,29 +1,23 @@
-# AI Video App — Design Spec (V1)
+# AI Video App — Design Spec
 
 **Author:** Harshit
 **Date:** 2026-05-13
-**Status:** Approved-pending-review
-**Target stakeholder review:** Nitin Kamble (recruiter), 2026-05-16 / 2026-05-17
+**Status:** V1 shipped, v1.1 + v1.2 live
 
 ---
 
-## 1. Context
+## 1. What I'm building
 
-Recruiter brief (Nitin Kamble, via WhatsApp, 2026-05-09):
+A small app that takes a topic (say *fractions* or *Hampi* or *the Lion and the Mouse*) and turns it into a short voiced video a learner can watch and quiz themselves on. I wanted to see how far I could push this using only the Google AI stack — no OpenAI, no ElevenLabs, no scraping. The whole thing runs locally with one `streamlit run` and produces an mp4 with motion, narration, captions, and an optional interactive layer (mid-video checkpoint, end-of-video quiz).
 
-> "Explore AI APIs of Google AI ecosystem... Consider a use case for developing an easy-to-use app to develop video content to explain a simple concept in math like fractions to a first-time learner. This could be many areas like creating a video on some historical site, a Panchatantra story etc. The video will also have an audio associated with it... Focus on Google stack and specifically the APIs."
+The brief I gave myself was deliberately broad — three categorically different content types (math, place, story) on the same architecture, with audio that doesn't sound robotic, and enough cost awareness that a stranger could fork the repo without bankrupting themselves on their first run.
 
-Decoded requirements:
+A few things I wanted to prove out:
 
-| Requirement | Source quote | Implication |
-|---|---|---|
-| Google stack only | "focus on Google stack and specifically the APIs" | No third-party APIs. No `gTTS`, no `pollinations.ai`, no OpenAI. |
-| Easy-to-use app | "easy to use app" | UI required. Non-technical user can operate it. |
-| Actual video | "develop video content" | Multi-scene .mp4 with motion, not static image + audio. |
-| Generalizes across content types | "fractions / historical site / Panchatantra story" | Architecture must handle math, place, and story content. |
-| Educational tone | "first-time learner" | Pedagogy-aware: tone, pacing, on-screen text. |
-| Audio | "video will also have an audio" | Professional TTS, ideally with prosody. |
-| Research transparency | "share links of material" | Doc log + citations. |
+- **Stack discipline.** Every layer is a Google service. The Director is Gemini 2.5 Flash with structured output. The frames are Imagen 4 (via Vertex AI). Optional cinematic video clips come from Veo 3. The voice is Cloud Text-to-Speech with the new Chirp 3 HD family. No third-party APIs anywhere in the runtime.
+- **Generalisation across content.** The same pipeline has to handle a math diagram (where precision is non-negotiable), a documentary-style historical place, and a children's fable. Each calls for a different visual style, voice, and motion grammar. I let the Director (Gemini) decide all of that per scene.
+- **An interactive layer.** A linear video is fine, but the moment you bake in a mid-video comprehension checkpoint and a summative quiz at the end, the architecture has to support state that survives across scene boundaries. That's a meaningfully different problem from "render an mp4."
+- **Cost honesty.** Every run prints a cost breakdown. Default mode (Imagen everywhere) lands at ~$0.20 per video; turning on Veo for narrative scenes pushes it to ~$9. I made Veo opt-in so the default never surprises anyone.
 
 ---
 
@@ -261,7 +255,7 @@ Cache key: SHA256 of `(topic, audience, content_type, model_versions)`.
 - **Imagen cache:** `outputs/_cache/images/<hash_per_prompt>.png` — skip image gen on hit.
 - **TTS cache:** `outputs/_cache/audio/<hash_per_text>.mp3` — skip TTS on hit.
 
-Reruns of the same topic become essentially free + instant. Demo cadence on the recruiter call matters.
+Reruns of the same topic become essentially free and near-instant — useful when iterating on prompts or showing the app live without burning through API calls every time.
 
 ---
 
@@ -273,7 +267,7 @@ ai-video-app/
 ├── .env.example                      # template
 ├── .gitignore
 ├── requirements.txt
-├── README.md                         # short story for recruiter
+├── README.md                         # quick-start + stack overview
 ├── NOTES.md                          # research log w/ Google doc links
 ├── docs/superpowers/specs/           # this file lives here
 ├── app.py                            # Streamlit entrypoint
@@ -301,7 +295,7 @@ ai-video-app/
 - Lyria background music
 - Tests (V1 verifies via manual end-to-end runs on 3 demo topics)
 - CI / linting / type checking
-- Vertex AI migration (mentioned to recruiter as production path)
+- Vertex AI migration of the Gemini call (the rest of the pipeline already runs on Vertex)
 - Streaming UI updates during generation
 - Multi-language UI
 
@@ -323,13 +317,11 @@ V1 ships when **all** of these hold:
 
 ## 12. v1.1 — Interactive Video Platform (2026-05-14)
 
-Built on top of V1 in response to feedback from the recruiter review (Nitin Kamble, 2026-05-14):
-
-> *"Check if there is support for interactive video. Use case being a quiz at the end of the video. Also a ad between the video."*
+After shipping V1 I went back and asked the obvious follow-up: a linear video is fine for a one-time watch, but what if the architecture could carry interaction state — a comprehension check mid-video, a quiz at the end, a slot for a pre-roll ad? Those are real product asks for anyone trying to use this for actual teaching. The point of v1.1 was less about "build a quiz UI" and more about proving the architecture extends to interactive video without rewriting the pipeline.
 
 ### 12.1 Scope of v1.1
 
-The literal asks (end-of-video quiz, ad between video) were generalised into an **Interactive Video Platform** with these capabilities:
+The capabilities baked in:
 
 | Feature | Mechanism |
 |---|---|
