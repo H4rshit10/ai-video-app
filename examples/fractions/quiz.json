@@ -1,37 +1,37 @@
 {
   "questions": [
     {
-      "question": "What is a 'whole' pizza before you cut it?",
+      "question": "What does Squeaky want to do with his yummy cookie?",
       "choices": [
-        "Many pieces",
-        "One big piece",
-        "A half",
-        "A quarter"
-      ],
-      "correct_index": 1,
-      "explanation": "Before you cut it, a pizza is one whole, complete item!"
-    },
-    {
-      "question": "How many equal pieces do you get if you cut a pizza into 'halves'?",
-      "choices": [
-        "One piece",
-        "Two pieces",
-        "Four pieces",
-        "Three pieces"
-      ],
-      "correct_index": 1,
-      "explanation": "You get two equal pieces when you cut something in half."
-    },
-    {
-      "question": "If you have four equal pieces of pizza, what is each piece called?",
-      "choices": [
-        "A half",
-        "A whole",
-        "A quarter",
-        "A slice"
+        "Eat it all by himself",
+        "Throw it away",
+        "Share it fairly with a friend",
+        "Hide it for later"
       ],
       "correct_index": 2,
-      "explanation": "Each of four equal pieces is called a quarter."
+      "explanation": "Squeaky is a good friend who wants to share his cookie fairly!"
+    },
+    {
+      "question": "When you cut something into equal pieces, what math idea are you using?",
+      "choices": [
+        "Magic",
+        "Fractions",
+        "Glue",
+        "Scissors"
+      ],
+      "correct_index": 1,
+      "explanation": "Fractions help us understand and describe equal parts of a whole."
+    },
+    {
+      "question": "If you cut an apple into two pieces, but one is much bigger than the other, are they 'halves'?",
+      "choices": [
+        "Yes, always",
+        "No, halves must be equal",
+        "Only if you say 'please'",
+        "Only if it's a red apple"
+      ],
+      "correct_index": 1,
+      "explanation": "For something to be a 'half,' the parts must be exactly the same size."
     }
   ]
 }

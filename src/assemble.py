@@ -10,6 +10,7 @@ Enhancements (v1.1):
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -189,29 +190,64 @@ def _headline_overlay(text: str, duration: float) -> list:
     return [pill, headline]
 
 
+def _split_into_sentences(text: str) -> list[str]:
+    """Split dialogue on terminal punctuation, keeping the punctuation with each chunk.
+
+    Examples:
+      "Hey there! Ever had a pizza?"  -> ["Hey there!", "Ever had a pizza?"]
+      "One sentence with no end"      -> ["One sentence with no end"]
+      "A. B. C."                       -> ["A.", "B.", "C."]
+    """
+    text = text.strip()
+    if not text:
+        return []
+    parts = re.split(r"(?<=[.!?])\s+", text)
+    return [p.strip() for p in parts if p.strip()]
+
+
 def _subtitle_overlay(dialogue: str, duration: float) -> list:
-    """Bottom-third subtitle band with the full spoken dialogue."""
+    """Bottom-third subtitle band with sentence-by-sentence timing.
+
+    The spoken dialogue is split on terminal punctuation; each sentence is
+    rendered as its own TextClip with start/duration mathematically divided
+    across the scene's runtime. The dark band stays visible the whole scene
+    so the layout is stable while the text rotates underneath it.
+    """
+    sentences = _split_into_sentences(dialogue)
+    if not sentences:
+        return []
+
     band = (
         ColorClip(size=(config.VIDEO_WIDTH, SUBTITLE_HEIGHT), color=(0, 0, 0))
         .with_opacity(0.65)
         .with_duration(duration)
         .with_position(("center", SUBTITLE_Y - 10))
     )
-    subtitle = (
-        TextClip(
-            text=dialogue,
-            font=config.CAPTION_FONT_PATH,
-            font_size=SUBTITLE_FONT_SIZE,
-            color="white",
-            stroke_color="black",
-            stroke_width=1,
-            method="caption",
-            size=(int(config.VIDEO_WIDTH * 0.92), SUBTITLE_HEIGHT - 20),
+    layers: list = [band]
+
+    per_sentence = duration / len(sentences)
+    for i, sentence in enumerate(sentences):
+        start = i * per_sentence
+        # Last sentence absorbs any remainder so the band never goes blank.
+        chunk_duration = (duration - start) if i == len(sentences) - 1 else per_sentence
+        subtitle = (
+            TextClip(
+                text=sentence,
+                font=config.CAPTION_FONT_PATH,
+                font_size=SUBTITLE_FONT_SIZE,
+                color="white",
+                stroke_color="black",
+                stroke_width=1,
+                method="caption",
+                size=(int(config.VIDEO_WIDTH * 0.92), SUBTITLE_HEIGHT - 20),
+            )
+            .with_start(start)
+            .with_duration(chunk_duration)
+            .with_position(("center", SUBTITLE_Y))
         )
-        .with_duration(duration)
-        .with_position(("center", SUBTITLE_Y))
-    )
-    return [band, subtitle]
+        layers.append(subtitle)
+
+    return layers
 
 
 # -------- Title / outro cards --------

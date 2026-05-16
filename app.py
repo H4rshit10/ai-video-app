@@ -30,12 +30,13 @@ st.set_page_config(page_title="AI Video Generator", page_icon="🎬", layout="wi
 def _init_state() -> None:
     defaults = {
         "result": None,
-        "interactive_index": 0,
+        "interactive_index": 0,              # current scene cursor (state machine)
         "checkpoint_answers": {},            # scene_index -> selected choice index
         "checkpoint_submitted": {},          # scene_index -> bool
         "quiz_answers": {},                  # question_index -> selected choice index
         "quiz_submitted": False,
         "preroll_done": False,
+        "midroll_done": False,               # mid-roll ad dismissed for this run
     }
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
@@ -48,6 +49,7 @@ def _reset_playback_state() -> None:
     st.session_state.quiz_answers = {}
     st.session_state.quiz_submitted = False
     st.session_state.preroll_done = False
+    st.session_state.midroll_done = False
 
 
 # ====================================================================
@@ -73,7 +75,7 @@ def _render_linear(result: RunResult) -> None:
 
 
 def _render_interactive(result: RunResult) -> None:
-    """Interactive mode: per-scene playback with checkpoints between scenes."""
+    """Interactive mode: per-scene playback with mid-roll ad + checkpoints between scenes."""
     scenes = result.plan.scenes
     clips = result.per_scene_clips
     idx = st.session_state.interactive_index
@@ -90,6 +92,17 @@ def _render_interactive(result: RunResult) -> None:
             st.rerun()
         return
 
+    # ---- Mid-roll ad gate (VAST/IMA Compliance Anchor Point) ---------------
+    # The ad slot fires once per run, right before the midpoint scene.
+    # Production wiring would replace this placeholder with a real Google IMA
+    # SDK call serving a VAST-tagged creative. Skip-after-N is the standard
+    # IAB linear-ad UX; we expose a manual skip here as the demo equivalent.
+    midpoint = len(scenes) // 2
+    if idx == midpoint and not st.session_state.midroll_done and idx > 0:
+        _render_midroll_ad(scene_index=idx, total_scenes=len(scenes))
+        return
+    # -----------------------------------------------------------------------
+
     scene = scenes[idx]
     clip_path = clips[idx] if idx < len(clips) else None
 
@@ -105,6 +118,40 @@ def _render_interactive(result: RunResult) -> None:
         if st.button("Continue to next scene ▶", type="primary", use_container_width=True, key=f"continue_{idx}"):
             st.session_state.interactive_index += 1
             st.rerun()
+
+
+def _render_midroll_ad(scene_index: int, total_scenes: int) -> None:
+    """Mid-roll ad slot — fires once per run at the midpoint scene.
+
+    VAST/IMA Compliance Anchor Point: this is the structural placeholder where
+    a production deployment plugs in Google IMA SDK's mid-roll cue point. The
+    SDK would (a) request a VAST-tagged creative from the ad server, (b) gate
+    the skip button on the ad's skip_offset attribute, and (c) emit IAB-defined
+    tracking pixels for start / first-quartile / midpoint / third-quartile /
+    complete. For this demo, the visual treatment + skip control match the
+    standard IAB linear-ad pattern; the network call is mocked out.
+    """
+    st.markdown(
+        """
+        <div style="
+            background: linear-gradient(135deg, #f6a93b 0%, #ff5e62 100%);
+            padding: 50px 30px;
+            border-radius: 14px;
+            text-align: center;
+            color: white;
+            margin: 10px 0;
+        ">
+            <div style="font-size: 14px; opacity: 0.75; letter-spacing: 2px;">MID-ROLL AD</div>
+            <h2 style="margin: 14px 0 8px;">Your brand here</h2>
+            <p style="opacity: 0.9; margin: 0;">5-second placeholder · VAST / IMA SDK cue point in v2</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption(f"Inserted between scene {scene_index} and scene {scene_index + 1} of {total_scenes}.")
+    if st.button("Skip mid-roll ▶", type="primary", use_container_width=True, key="midroll_skip"):
+        st.session_state.midroll_done = True
+        st.rerun()
 
 
 def _render_checkpoint(scene_index: int, scene) -> None:
@@ -151,12 +198,21 @@ def _render_checkpoint(scene_index: int, scene) -> None:
 
 def _render_end_quiz(result: RunResult) -> None:
     quiz = result.plan.end_quiz
+    total = len(quiz.questions)
+    answered = len(st.session_state.quiz_answers)
+
     st.markdown("## 📝 End-of-video quiz")
-    st.caption(f"{len(quiz.questions)} questions on what you just watched.")
+    st.caption(f"{total} questions on what you just watched.")
 
     if not st.session_state.quiz_submitted:
+        # Progress indicator — dots + count.
+        dots = "● " * answered + "○ " * (total - answered)
+        st.markdown(f"**Progress:** {dots}  ({answered} of {total} answered)")
+        st.write("")
+
         for i, q in enumerate(quiz.questions):
-            st.markdown(f"**{i + 1}. {q.question}**")
+            st.markdown(f"**Question {i + 1} of {total}**")
+            st.markdown(q.question)
             choice = st.radio(
                 f"Q{i + 1}",
                 options=list(range(len(q.choices))),
@@ -170,8 +226,8 @@ def _render_end_quiz(result: RunResult) -> None:
             st.write("")
 
         if st.button("Submit quiz", type="primary", use_container_width=True):
-            if len(st.session_state.quiz_answers) < len(quiz.questions):
-                st.warning("Please answer every question before submitting.")
+            if len(st.session_state.quiz_answers) < total:
+                st.warning(f"Please answer every question before submitting ({answered} of {total} done).")
             else:
                 st.session_state.quiz_submitted = True
                 st.rerun()

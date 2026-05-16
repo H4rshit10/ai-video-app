@@ -1,13 +1,13 @@
 {
-  "1": {
-    "question": "When you cut a pizza into two equal pieces, what do we call each piece?",
+  "2": {
+    "question": "What do we call each part when a cookie is cut into two *equal* pieces?",
     "choices": [
-      "A slice",
+      "A big piece",
       "A half",
-      "A quarter",
-      "A whole"
+      "A whole",
+      "A bite"
     ],
     "correct_index": 1,
-    "explanation": "That's right! When you split something into two equal parts, each part is called a half."
+    "explanation": "That's right! When you cut something into two equal parts, each part is called a half. Fractions are all about those equal parts!"
   }
 }
