@@ -93,11 +93,32 @@ def generate_video(
     _emit(progress, f"Planning '{topic}' for {audience}...")
     plan = director.plan_video(topic, audience, content_type)
 
-    # Veo policy: when disallowed, force every scene to imagen for consistency + cost predictability.
+    # Veo policy:
+    # 1. If allow_veo=False -> force every scene to imagen (cost-safe default).
+    # 2. If allow_veo=True and content_type in {story, general} but the Director
+    #    didn't pick any "veo" scenes -> force the middle scenes (everything
+    #    except first and last) to "veo". This is the guardrail: a story video
+    #    with zero Veo scenes is the bug we just shipped through. Surfacing a
+    #    warning isn't enough; users expect Veo to actually fire when they
+    #    enable it.
     if not allow_veo:
         plan = plan.model_copy(update={
             "scenes": [s.model_copy(update={"generator": "imagen"}) for s in plan.scenes]
         })
+    elif (
+        plan.content_type in ("story", "general")
+        and not any(s.generator == "veo" for s in plan.scenes)
+        and len(plan.scenes) >= 3
+    ):
+        logger.info("allow_veo=True but Director picked no veo scenes; forcing middle scenes to veo.")
+        last_idx = len(plan.scenes) - 1
+        forced = [
+            s.model_copy(update={"generator": "veo"})
+            if 0 < s.scene_index < last_idx
+            else s
+            for s in plan.scenes
+        ]
+        plan = plan.model_copy(update={"scenes": forced})
 
     veo_attempted = any(s.generator == "veo" for s in plan.scenes)
 

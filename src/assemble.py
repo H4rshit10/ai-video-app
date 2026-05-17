@@ -17,6 +17,7 @@ from pathlib import Path
 from moviepy import (
     AudioFileClip,
     ColorClip,
+    CompositeAudioClip,
     CompositeVideoClip,
     ImageClip,
     TextClip,
@@ -109,38 +110,101 @@ def _save_clip(clip, path: Path) -> None:
 
 # -------- Scene builder --------
 
-def _build_scene_clip(sa: SceneAssets):
-    duration = max(sa.scene.duration_seconds, sa.audio_duration) + 0.4
+SLOW_FLOOR = 0.6  # Cap on slow-mo before we accept a freeze-frame tail.
 
+
+def _build_scene_clip(sa: SceneAssets):
+    """Build one scene clip with audio-authoritative duration.
+
+    The TTS narration is the source of truth for scene length. Veo clips that
+    come up short are slowed (down to SLOW_FLOOR = 0.6x) to fit the narration;
+    if they're still short after capping, the last frame freezes briefly to
+    fill — much rarer than before. Veo clips that are longer than the
+    narration are trimmed at audio end. Imagen scenes are static and accept
+    any duration via Ken Burns motion.
+    """
+    target_duration = sa.audio_duration + 0.2  # short breathing tail
+
+    veo_ambient = None
     if sa.visual.kind == "image":
         base = _apply_motion(
             ImageClip(str(sa.visual.path))
             .resized((config.VIDEO_WIDTH, config.VIDEO_HEIGHT))
-            .with_duration(duration),
+            .with_duration(target_duration),
             motion_style=getattr(sa.scene, "motion_style", "gentle_drift"),
-            duration=duration,
+            duration=target_duration,
         )
     else:
         video = VideoFileClip(str(sa.visual.path)).resized(
             (config.VIDEO_WIDTH, config.VIDEO_HEIGHT)
         )
-        if video.duration < duration:
-            base = video.with_duration(duration)
-        else:
-            base = video.subclipped(0, duration)
+        veo_ambient = video.audio  # keep original ambient before any time-stretch
+        base = _fit_video_to_audio(video, target_duration)
 
     layers = [base]
 
     if sa.scene.on_screen_text:
-        layers.extend(_headline_overlay(sa.scene.on_screen_text, duration))
+        layers.extend(_headline_overlay(sa.scene.on_screen_text, target_duration))
 
     if sa.scene.enable_subtitles:
-        layers.extend(_subtitle_overlay(sa.scene.audio_dialogue, duration))
+        layers.extend(_subtitle_overlay(sa.scene.audio_dialogue, target_duration))
 
     composite = CompositeVideoClip(layers, size=(config.VIDEO_WIDTH, config.VIDEO_HEIGHT))
-    composite = composite.with_duration(duration)
-    composite = composite.with_audio(AudioFileClip(str(sa.audio_path)))
+    composite = composite.with_duration(target_duration)
+    composite = composite.with_audio(_build_scene_audio(sa.audio_path, veo_ambient, target_duration))
     return composite
+
+
+def _fit_video_to_audio(video, target_duration: float):
+    """Stretch or trim a Veo clip to match the narration's runtime.
+
+    - If narration <= video: trim video at audio end (preserves full action).
+    - If narration > video: slow video by the needed factor, capped at
+      SLOW_FLOOR. If even SLOW_FLOOR isn't enough, the last frame freezes
+      to fill the short remaining gap (much smaller than before).
+    """
+    if target_duration <= video.duration:
+        return video.subclipped(0, target_duration)
+
+    needed_factor = video.duration / target_duration
+    if needed_factor >= SLOW_FLOOR:
+        # Slow the clip proportionally so its new duration matches the audio.
+        try:
+            return video.with_speed_scaled(needed_factor)
+        except AttributeError:
+            logger.warning("with_speed_scaled unavailable; using freeze-frame fallback.")
+            return video.with_duration(target_duration)
+
+    # Mismatch too large — cap the slow-down at SLOW_FLOOR and freeze the
+    # remaining tail. The freeze is now bounded to at most a couple of seconds.
+    try:
+        slowed = video.with_speed_scaled(SLOW_FLOOR)
+    except AttributeError:
+        slowed = video
+    return slowed.with_duration(target_duration)
+
+
+def _build_scene_audio(tts_path: Path, veo_ambient, duration: float):
+    """Mix the TTS narration with Veo's native ambient sound (if present).
+
+    For Imagen scenes there is no ambient; the narration plays clean.
+    For Veo scenes the ambient is ducked to ~35% and layered under the
+    narration so footsteps / wind / environmental sound feel present and
+    grounded without competing with the voice.
+    """
+    tts = AudioFileClip(str(tts_path))
+    if veo_ambient is None:
+        return tts
+    try:
+        ducked = veo_ambient.with_volume_scaled(0.35)
+    except AttributeError:
+        # Fall back gracefully if a future moviepy release drops the helper —
+        # keep the narration clean rather than crash.
+        logger.warning("AudioClip.with_volume_scaled unavailable; skipping ambient mix.")
+        return tts
+    if ducked.duration > duration:
+        ducked = ducked.subclipped(0, duration)
+    return CompositeAudioClip([ducked, tts])
 
 
 def _apply_motion(clip, motion_style: str, duration: float):
@@ -166,13 +230,7 @@ def _apply_motion(clip, motion_style: str, duration: float):
 
 
 def _headline_overlay(text: str, duration: float) -> list:
-    """Upper-third headline with dark pill background. Two layers: pill + text."""
-    pill = (
-        ColorClip(size=(config.VIDEO_WIDTH, HEADLINE_HEIGHT), color=(0, 0, 0))
-        .with_opacity(0.55)
-        .with_duration(duration)
-        .with_position(("center", HEADLINE_Y - 10))
-    )
+    """Upper-third headline — clean text with strong stroke, no background box."""
     headline = (
         TextClip(
             text=text,
@@ -180,14 +238,14 @@ def _headline_overlay(text: str, duration: float) -> list:
             font_size=HEADLINE_FONT_SIZE,
             color="white",
             stroke_color="black",
-            stroke_width=2,
+            stroke_width=4,
             method="caption",
             size=(int(config.VIDEO_WIDTH * 0.85), HEADLINE_HEIGHT - 20),
         )
         .with_duration(duration)
         .with_position(("center", HEADLINE_Y))
     )
-    return [pill, headline]
+    return [headline]
 
 
 def _split_into_sentences(text: str) -> list[str]:
@@ -206,29 +264,22 @@ def _split_into_sentences(text: str) -> list[str]:
 
 
 def _subtitle_overlay(dialogue: str, duration: float) -> list:
-    """Bottom-third subtitle band with sentence-by-sentence timing.
+    """Bottom-third subtitles — sentence-by-sentence timed, no background box.
 
     The spoken dialogue is split on terminal punctuation; each sentence is
     rendered as its own TextClip with start/duration mathematically divided
-    across the scene's runtime. The dark band stays visible the whole scene
-    so the layout is stable while the text rotates underneath it.
+    across the scene's runtime. Text uses a thick black stroke for readability
+    over any background (light frame, dark frame, busy frame) without needing
+    an opaque rectangle behind it.
     """
     sentences = _split_into_sentences(dialogue)
     if not sentences:
         return []
 
-    band = (
-        ColorClip(size=(config.VIDEO_WIDTH, SUBTITLE_HEIGHT), color=(0, 0, 0))
-        .with_opacity(0.65)
-        .with_duration(duration)
-        .with_position(("center", SUBTITLE_Y - 10))
-    )
-    layers: list = [band]
-
+    layers: list = []
     per_sentence = duration / len(sentences)
     for i, sentence in enumerate(sentences):
         start = i * per_sentence
-        # Last sentence absorbs any remainder so the band never goes blank.
         chunk_duration = (duration - start) if i == len(sentences) - 1 else per_sentence
         subtitle = (
             TextClip(
@@ -237,7 +288,7 @@ def _subtitle_overlay(dialogue: str, duration: float) -> list:
                 font_size=SUBTITLE_FONT_SIZE,
                 color="white",
                 stroke_color="black",
-                stroke_width=1,
+                stroke_width=3,
                 method="caption",
                 size=(int(config.VIDEO_WIDTH * 0.92), SUBTITLE_HEIGHT - 20),
             )

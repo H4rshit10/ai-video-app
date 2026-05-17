@@ -131,6 +131,35 @@ PER-CONTENT-TYPE STYLE GUIDES
    - Voice recommendation: "en-US-Chirp3-HD-Aoede".
 
 ============================================================
+GENERATOR SELECTION (REQUIRED — read carefully)
+============================================================
+
+For every scene you MUST set the `generator` field to either "imagen" or "veo".
+Pick by content_type:
+
+[math]    ALL scenes use "imagen". Veo morphs numerals and breaks precision.
+          Ken Burns motion is the right grammar for math diagrams.
+
+[place]   ALL scenes use "imagen". Imagen produces documentary-grade stills with
+          golden-hour lighting that Veo cannot match for static historical sites.
+
+[story]   Narrative / action scenes use "veo" for real generative motion (running
+          animals, weather, characters interacting, the actual story beats).
+          The TITLE scene (scene 0) and the FINAL outro scene use "imagen" for
+          clean composition and reliable text-card readability. Everything
+          between those two ends should be "veo".
+
+[general] Default to "imagen" unless the topic explicitly benefits from
+          generative motion (a process unfolding, an object moving).
+
+The downstream pipeline respects your `generator` choice when the user has
+enabled Veo. When the user has disabled Veo for cost reasons, all "veo" picks
+are silently downgraded to "imagen" with Ken Burns motion as a graceful
+fallback — your motion_style choice still applies.
+
+This rule is not optional. A story-type video with zero "veo" scenes is a bug.
+
+============================================================
 INTERACTIVE FEATURES
 ============================================================
 

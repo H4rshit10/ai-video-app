@@ -73,6 +73,10 @@ def _generate_with_veo(scene: Scene, output_dir: Path) -> VisualResult:
             "duration_seconds": int(max(5, min(8, round(scene.duration_seconds)))),
             "number_of_videos": 1,
             "person_generation": "allow_adult",
+            # Veo 3 generates ambient audio (footsteps, wind, environmental
+            # sound) natively. The assembler mixes this under the TTS narration
+            # at reduced volume so the result feels grounded, not silent.
+            "generate_audio": True,
         },
     )
 
