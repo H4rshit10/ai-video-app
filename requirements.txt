@@ -18,3 +18,12 @@ pydantic>=2.6.0
 
 # Config / secrets loading
 python-dotenv>=1.0.0
+
+# Optional V2 backend (Postgres + pgvector for run history and RAG grounding).
+# Safe to install even when ENABLE_POSTGRES=false — modules are loaded lazily.
+psycopg[binary]>=3.2.0
+pgvector>=0.3.0
+
+# Optional MCP (Model Context Protocol) — lets the pipeline call out to any
+# external MCP image server alongside the built-in Imagen 4 path. Lazy-loaded.
+mcp>=1.0.0
